@@ -16,6 +16,10 @@ Munirah Binte Mohamad
 
 Enumerate the machine and get all the important information.
 
+
+
+**Qn1. How many open ports?** 
+
 ```Kali
 nmap -sC -sV -A -Pn <Target IP Address>
 ```
@@ -30,7 +34,13 @@ nmap -sC -sV -A -Pn <Target IP Address>
 
 
 
-Qn1, How many open ports? 3
+**Answer: 3**
+
+
+
+**Qn2. How you redirect yourself to a secret page? **
+
+
 
 Since port 90 is open, it means we can access the HTTP of the IP Address. Thus, open up a browser and enter the ip address of the target machine.
 
@@ -40,7 +50,11 @@ Since port 90 is open, it means we can access the HTTP of the IP Address. Thus, 
 
 
 
-Qn2. How you redirect yourself to a secret page? User-agent
+**Answer: User-Agent**
+
+
+
+**Qn3. What is the agent name?**
 
 We know that Agent R exist. So, let's try finding Agent's R homepage.
 
@@ -53,13 +67,13 @@ We know that Agent R exist. So, let's try finding Agent's R homepage.
 
 Alright, at least we managed to get Agent R's page. Since the agent's names are in letters, we should try all 26 alphabets until we find something.
 
-I tried A and B but it produces the same body context as R. But, it was different when I found C.
+I tried A and B but it produces the same body context as R. But, C produced a different result.
 
 
 
 <img src="D:\Digital Forensics\CTF\TryHackMe\Sudo Agent\Curl C.jpg" alt="Curl C" style="zoom:150%;" />
 
-Qn3. What is the agent name? Chris
+Answer: Chris
 
 
 
@@ -69,29 +83,63 @@ Qn3. What is the agent name? Chris
 
 Done Enumerating the machine? Time to brute your way out.
 
+
+
+<u>**Qn1. FTP password**</u>
+
+Using Hydra to brute force the FTP login.
+
 ```
-hydra -l chris -P /usr/share/wordlists/rockyou.txt -vV 10.10.243.6 ftp
+hydra -l chris -P /usr/share/wordlists/rockyou.txt -vV <Target IP Addr> ftp
 ```
 
 ![Hydra ftp](D:\Digital Forensics\CTF\TryHackMe\Sudo Agent\Hydra ftp.jpg)
 
 
 
-Qn1. FTP password
+Use the command below to access the FTP Server.
+
+```
+ftp <Target IP Addr>
+```
+
+
 
 ![ftp dir](D:\Digital Forensics\CTF\TryHackMe\Sudo Agent\ftp dir.jpg)
 
 
 
+After gaining access to the FTP Server, use the following command to download the file to your local computer current directory.
+
+```Kali
+mget <file name>
+```
+
+
+
 ![Repeat same rest](D:\Digital Forensics\CTF\TryHackMe\Sudo Agent\Repeat same rest.jpg)
 
-Repea the same for all thee
+
+
+Repeat the same steps for the other 2  files to download them to your local directory.
+
+Once the files have been download, read the "To_agentJ.txt".
+
+
 
 ![agent j](D:\Digital Forensics\CTF\TryHackMe\Sudo Agent\agent j.jpg)
 
-Qn2. Zip File Password
+
+
+<u>**Qn2. Zip File Password**</u>
+
+Form the textfile above, we know that the password is stored in either one of the pictures. Use the binwalk command to check if there is anything in the pictures.
 
 ![binwalk](D:\Digital Forensics\CTF\TryHackMe\Sudo Agent\binwalk.jpg)
+
+
+
+It seems like cutie.png has a zip data compressed in the file. Thus, to extract the files within the PNG file, we can sue the binwalk command.
 
 
 
@@ -99,9 +147,21 @@ Qn2. Zip File Password
 
 
 
+When I tried to unzip the file using the unzip command, it failed because the zip file was encrypted. Therefore, I decided to use zip2john to read the hash and use the john command to crack the hash.
+
+
+
 ![retriving passwd](D:\Digital Forensics\CTF\TryHackMe\Sudo Agent\retriving passwd.jpg)
 
+ Once the password has been revealed, use the following command to extract the secret text file in the picture.
+
+
+
 ![unzip zip file with passwd](D:\Digital Forensics\CTF\TryHackMe\Sudo Agent\unzip zip file with passwd.jpg)
+
+
+
+Read the secret file.
 
 
 
@@ -109,7 +169,15 @@ Qn2. Zip File Password
 
 
 
+It seems like the word is encrypted, I decided to decode it using base64 and it works!
+
+
+
 ![passwd decoded](D:\Digital Forensics\CTF\TryHackMe\Sudo Agent\passwd decoded.jpg)
+
+
+
+To check for information on the secret file in the picture, use the command below.:
 
 
 
@@ -117,7 +185,7 @@ Qn2. Zip File Password
 
 
 
-
+Since it has been confirmed that there secret file is inside, use the command below to extract the secret file from the JPG file.
 
 ![Steghide extraction](D:\Digital Forensics\CTF\TryHackMe\Sudo Agent\Steghide extraction.jpg)
 
@@ -127,7 +195,7 @@ Qn2. Zip File Password
 
 
 
-Qn3. Steg Password
+
 
 Qn4.Who is the other agent (in full name)?
 
